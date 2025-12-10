@@ -23,7 +23,9 @@ namespace ScreenEdgeLight
 
             // Tray icon
             _trayIcon = new WinForms.NotifyIcon();
-            _trayIcon.Icon = new System.Drawing.Icon("Resources/app_logo.ico");
+            var iconUri = new Uri("pack://application:,,,/app_logo.ico");
+var stream = Application.GetResourceStream(iconUri).Stream;
+_trayIcon.Icon = new System.Drawing.Icon(stream);
             _trayIcon.Text = "Screen Edge Light";
             _trayIcon.Visible = false;
 
