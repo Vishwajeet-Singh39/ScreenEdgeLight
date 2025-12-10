@@ -4,7 +4,8 @@
         Title="Screen Edge Light"
         Height="340"
         Width="400"
-        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanMinimize"
         Background="#F3F3F3"
         FontFamily="Segoe UI">
 
