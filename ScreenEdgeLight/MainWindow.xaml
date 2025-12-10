@@ -8,15 +8,23 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- 0: enable -->
             <RowDefinition Height="10"/>
             <RowDefinition Height="Auto"/>
+            <!-- 2: thickness -->
             <RowDefinition Height="10"/>
             <RowDefinition Height="Auto"/>
+            <!-- 4: opacity -->
             <RowDefinition Height="10"/>
             <RowDefinition Height="Auto"/>
+            <!-- 6: color buttons -->
+            <RowDefinition Height="Auto"/>
+            <!-- 7: minimise-to-tray button -->
             <RowDefinition Height="*"/>
+            <!-- 8: tip text -->
         </Grid.RowDefinitions>
 
+        <!-- Enable -->
         <CheckBox x:Name="EnableCheckBox"
                   Content="Enable edge light"
                   IsChecked="True"
@@ -58,7 +66,16 @@
             <Button Content="Cool" Click="CoolButton_Click"/>
         </StackPanel>
 
-        <TextBlock Grid.Row="7"
+        <!-- Minimise to tray button -->
+        <Button Grid.Row="7"
+                Content="Minimize to tray"
+                Width="140"
+                HorizontalAlignment="Right"
+                Margin="0,8,0,0"
+                Click="MinimizeToTray_Click"/>
+
+        <!-- Tip -->
+        <TextBlock Grid.Row="8"
                    Margin="0,10,0,0"
                    TextWrapping="Wrap"
                    Opacity="0.7">

@@ -1,6 +1,9 @@
 using System;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
+using WinForms = System.Windows.Forms;
+using Drawing = System.Drawing;
 
 namespace ScreenEdgeLight
 {
@@ -11,10 +14,35 @@ namespace ScreenEdgeLight
             get { return App.Overlay; }
         }
 
+        private WinForms.NotifyIcon _trayIcon;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            // Create tray icon
+            _trayIcon = new WinForms.NotifyIcon();
+            _trayIcon.Icon = Drawing.SystemIcons.Application; // you can swap this for your own .ico
+            _trayIcon.Text = "Screen Edge Light";
+            _trayIcon.Visible = false;
+
+            // Tray context menu
+            WinForms.ContextMenuStrip menu = new WinForms.ContextMenuStrip();
+            menu.Items.Add("Show", null, OnTrayShowClicked);
+            menu.Items.Add("Exit", null, OnTrayExitClicked);
+            _trayIcon.ContextMenuStrip = menu;
+
+            // Double-click tray icon to show window
+            _trayIcon.MouseUp += TrayIcon_MouseUp;
+
+            // Optional hotkey: Ctrl+Shift+E to toggle this window
+            RoutedCommand toggleCmd = new RoutedCommand();
+            toggleCmd.InputGestures.Add(
+                new KeyGesture(Key.E, ModifierKeys.Control | ModifierKeys.Shift));
+            CommandBindings.Add(new CommandBinding(toggleCmd, ToggleSelf));
+
             Loaded += MainWindow_Loaded;
+            StateChanged += MainWindow_StateChanged;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -24,6 +52,85 @@ namespace ScreenEdgeLight
             UpdateOverlayOpacity();
             SetWarmColor();
         }
+
+        // ------------ Tray handling ------------
+
+        private void MinimizeToTray_Click(object sender, RoutedEventArgs e)
+        {
+            MinimizeToTray();
+        }
+        private void TrayIcon_MouseUp(object sender, WinForms.MouseEventArgs e)
+{
+    if (e.Button == WinForms.MouseButtons.Left)
+    {
+        if (Visibility == Visibility.Visible)
+    MinimizeToTray();
+else
+    RestoreFromTray();   // single left-click restores
+    }
+}
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            // If user clicks normal minimize button, also go to tray
+            if (WindowState == WindowState.Minimized)
+            {
+                MinimizeToTray();
+            }
+        }
+
+        private void MinimizeToTray()
+        {
+            _trayIcon.Visible = true;
+            Hide();
+        }
+
+        private void RestoreFromTray()
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+            _trayIcon.Visible = false;
+        }
+
+        private void TrayIcon_DoubleClick(object sender, EventArgs e)
+        {
+            if (Visibility == Visibility.Visible)
+    MinimizeToTray();
+else
+    RestoreFromTray();
+        }
+
+        private void OnTrayShowClicked(object sender, EventArgs e)
+        {
+            if (Visibility == Visibility.Visible)
+    MinimizeToTray();
+else
+    RestoreFromTray();
+        }
+
+        private void OnTrayExitClicked(object sender, EventArgs e)
+        {
+            _trayIcon.Visible = false;
+            _trayIcon.Dispose();
+            Application.Current.Shutdown();
+        }
+
+        private void ToggleSelf(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                MinimizeToTray();
+            }
+            else
+            {
+                if (Visibility == Visibility.Visible)
+    MinimizeToTray();
+else
+    RestoreFromTray();
+            }
+        }
+
+        // ------------ Overlay controls ------------
 
         private void EnableCheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -88,6 +195,8 @@ namespace ScreenEdgeLight
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
+            _trayIcon.Visible = false;
+            _trayIcon.Dispose();
             Application.Current.Shutdown();
         }
     }
