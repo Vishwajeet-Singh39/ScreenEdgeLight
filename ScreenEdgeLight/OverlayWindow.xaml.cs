@@ -4,7 +4,6 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using WinForms = System.Windows.Forms;
 
-
 namespace ScreenEdgeLight
 {
     public partial class OverlayWindow : Window
@@ -23,43 +22,41 @@ namespace ScreenEdgeLight
         }
 
         private void OverlayWindow_Loaded(object sender, RoutedEventArgs e)
-{
-    // Use primary screen only
-    WinForms.Screen primary = WinForms.Screen.PrimaryScreen;
+        {
+            WinForms.Screen primary = WinForms.Screen.PrimaryScreen;
 
-    // Full monitor bounds
-    System.Drawing.Rectangle bounds = primary.Bounds;
-    // Working area (excludes taskbar)
-    System.Drawing.Rectangle work   = primary.WorkingArea;
+            var bounds = primary.Bounds;
+            var work = primary.WorkingArea;
 
-    // Position overlay to cover the full monitor
-    Left   = bounds.Left;
-    Top    = bounds.Top;
-    Width  = bounds.Width;
-    Height = bounds.Height;
+            // Full monitor
+            Left = bounds.Left;
+            Top = bounds.Top;
+            Width = bounds.Width;
+            Height = bounds.Height;
 
-    // Compute margins where the taskbar lives
-    int marginLeft   = work.Left   - bounds.Left;
-    int marginTop    = work.Top    - bounds.Top;
-    int marginRight  = bounds.Right  - work.Right;
-    int marginBottom = bounds.Bottom - work.Bottom;
+            // Margins where taskbar lives
+            int marginLeft = work.Left - bounds.Left;
+            int marginTop = work.Top - bounds.Top;
+            int marginRight = bounds.Right - work.Right;
+            int marginBottom = bounds.Bottom - work.Bottom;
 
-    // Push the edge bars away from the taskbar
-    RootGrid.Margin = new Thickness(
-        marginLeft,
-        marginTop,
-        marginRight,
-        marginBottom
-    );
+            // Also skip the title-bar / caption height so we don't cover it
+            double caption = SystemParameters.CaptionHeight;
+            //marginTop += (int)caption;
 
-    ApplySettings();
-}
+            RootGrid.Margin = new Thickness(
+                marginLeft,
+                marginTop,
+                marginRight,
+                marginBottom);
 
+            ApplySettings();
+        }
 
         private void OverlayWindow_SourceInitialized(object sender, EventArgs e)
         {
             var hwnd = new WindowInteropHelper(this).Handle;
-            NativeMethods.MakeWindowClickThrough(hwnd);   // will compile once NativeMethods is correct
+            NativeMethods.MakeWindowClickThrough(hwnd);
         }
 
         public void SetEnabled(bool enabled)
@@ -107,15 +104,13 @@ namespace ScreenEdgeLight
             SolidColorBrush brush = new SolidColorBrush(_currentColor);
             brush.Opacity = _currentOpacity;
 
-            TopRect.Fill    = brush;
-            BottomRect.Fill = brush;
-            LeftRect.Fill   = brush;
-            RightRect.Fill  = brush;
+            // Single border = no seams, inside remains transparent
+            EdgeBorder.BorderBrush = brush;
+            EdgeBorder.BorderThickness = new Thickness(_currentThickness);
 
-            TopRow.Height    = new GridLength(_currentThickness);
-            BottomRow.Height = new GridLength(_currentThickness);
-            LeftCol.Width    = new GridLength(_currentThickness);
-            RightCol.Width   = new GridLength(_currentThickness);
+            // Rounded outer + inner corners
+            double radius = _currentThickness;
+            EdgeBorder.CornerRadius = new CornerRadius(radius);
         }
     }
 }
