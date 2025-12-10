@@ -2,85 +2,216 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Screen Edge Light"
-        Height="260"
-        Width="360"
-        ResizeMode="NoResize">
-    <Grid Margin="10">
+        Height="340"
+        Width="400"
+        ResizeMode="NoResize"
+        Background="#F3F3F3"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+
+        <!-- Accent brush uses system highlight so it matches the OS theme -->
+        <SolidColorBrush x:Key="AccentBrush"
+                         Color="{x:Static SystemParameters.WindowGlassColor}" />
+
+        <!-- Generic button style: rounded, subtle border, hover/press states -->
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="MinWidth" Value="70"/>
+            <Setter Property="Background" Value="#FFFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#22000000"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#222222"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border"
+                                        Property="BorderBrush"
+                                        Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#FFF5F5F5"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#FFE0E0E0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border"
+                                        Property="Opacity"
+                                        Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Simple header text style -->
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+    </Window.Resources>
+
+    <!-- Main layout -->
+    <Grid Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- 0: enable -->
+            <RowDefinition Height="Auto"/>   <!-- Title row -->
             <RowDefinition Height="10"/>
-            <RowDefinition Height="Auto"/>
-            <!-- 2: thickness -->
-            <RowDefinition Height="10"/>
-            <RowDefinition Height="Auto"/>
-            <!-- 4: opacity -->
-            <RowDefinition Height="10"/>
-            <RowDefinition Height="Auto"/>
-            <!-- 6: color buttons -->
-            <RowDefinition Height="Auto"/>
-            <!-- 7: minimise-to-tray button -->
-            <RowDefinition Height="*"/>
-            <!-- 8: tip text -->
+            <RowDefinition Height="Auto"/>   <!-- Card -->
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>   <!-- Footer / tip -->
         </Grid.RowDefinitions>
 
-        <!-- Enable -->
-        <CheckBox x:Name="EnableCheckBox"
-                  Content="Enable edge light"
-                  IsChecked="True"
-                  Checked="EnableCheckBox_Checked"
-                  Unchecked="EnableCheckBox_Checked"/>
-
-        <!-- Thickness -->
-        <StackPanel Grid.Row="2" Orientation="Vertical">
-            <TextBlock Text="Edge thickness (px)" Margin="0,0,0,4"/>
-            <Slider x:Name="ThicknessSlider"
-                    Minimum="0"
-                    Maximum="300"
-                    Value="80"
-                    ValueChanged="ThicknessSlider_ValueChanged"/>
+        <!-- Window header inside content -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock Text="Screen Edge Light"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Foreground="#222222"/>
+            <TextBlock Text="  •  Video call fill light"
+                       FontSize="12"
+                       Foreground="#808080"
+                       VerticalAlignment="Center"/>
         </StackPanel>
 
-        <!-- Brightness -->
-        <StackPanel Grid.Row="4" Orientation="Vertical">
-            <TextBlock Text="Brightness (opacity)" Margin="0,0,0,4"/>
-            <Slider x:Name="OpacitySlider"
-                    Minimum="0"
-                    Maximum="1"
-                    SmallChange="0.05"
-                    LargeChange="0.1"
-                    TickFrequency="0.05"
-                    IsSnapToTickEnabled="False"
-                    Value="0.7"
-                    ValueChanged="OpacitySlider_ValueChanged"/>
-        </StackPanel>
+        <!-- Card with all controls -->
+        <Border Grid.Row="2"
+                Background="#FFFFFFFF"
+                CornerRadius="12"
+                Padding="14"
+                BorderBrush="#14000000"
+                BorderThickness="1"
+                SnapsToDevicePixels="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>  <!-- toggle -->
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="Auto"/>  <!-- thickness -->
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>  <!-- opacity -->
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>  <!-- color row -->
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>  <!-- buttons row -->
+                </Grid.RowDefinitions>
 
-        <!-- Color presets -->
-        <StackPanel Grid.Row="6"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0,8,0,0">
-            <TextBlock Text="Color:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-            <Button Content="Warm" Margin="0,0,4,0" Click="WarmButton_Click"/>
-            <Button Content="Neutral" Margin="0,0,4,0" Click="NeutralButton_Click"/>
-            <Button Content="Cool" Click="CoolButton_Click"/>
-        </StackPanel>
+                <!-- Enable toggle -->
+                <DockPanel Grid.Row="0">
+                    <CheckBox x:Name="EnableCheckBox"
+                              Content="Enable edge light"
+                              FontSize="13"
+                              VerticalAlignment="Center"
+                              IsChecked="True"
+                              Checked="EnableCheckBox_Checked"
+                              Unchecked="EnableCheckBox_Checked"/>
+                </DockPanel>
 
-        <!-- Minimise to tray button -->
-        <Button Grid.Row="7"
-                Content="Minimize to tray"
-                Width="140"
-                HorizontalAlignment="Right"
-                Margin="0,8,0,0"
-                Click="MinimizeToTray_Click"/>
+                <!-- Thickness slider -->
+                <StackPanel Grid.Row="2">
+                    <TextBlock Text="Edge thickness"
+                               Style="{StaticResource SectionHeader}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Slider x:Name="ThicknessSlider"
+                                Minimum="0"
+                                Maximum="300"
+                                Value="80"
+                                Width="230"
+                                VerticalAlignment="Center"
+                                ValueChanged="ThicknessSlider_ValueChanged"/>
+                        <TextBlock Text="{Binding ElementName=ThicknessSlider, Path=Value, StringFormat={}{0:0}px}"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   Foreground="#666666"/>
+                    </StackPanel>
+                </StackPanel>
 
-        <!-- Tip -->
-        <TextBlock Grid.Row="8"
-                   Margin="0,10,0,0"
+                <!-- Brightness slider -->
+                <StackPanel Grid.Row="4" Margin="0,4,0,0">
+                    <TextBlock Text="Brightness"
+                               Style="{StaticResource SectionHeader}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Slider x:Name="OpacitySlider"
+                                Minimum="0"
+                                Maximum="1"
+                                SmallChange="0.05"
+                                LargeChange="0.1"
+                                TickFrequency="0.05"
+                                IsSnapToTickEnabled="False"
+                                Value="1"
+                                Width="230"
+                                VerticalAlignment="Center"
+                                ValueChanged="OpacitySlider_ValueChanged"/>
+                        <TextBlock Text="{Binding ElementName=OpacitySlider, Path=Value, StringFormat={}{0:P0}}"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   Foreground="#666666"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Color preset buttons -->
+                <StackPanel Grid.Row="6"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Color"
+                               Style="{StaticResource SectionHeader}"
+                               Margin="0,0,8,0"
+                               VerticalAlignment="Center"/>
+                    <Button Content="Warm"
+                            Click="WarmButton_Click"/>
+                    <Button Content="Neutral"
+                            Click="NeutralButton_Click"/>
+                    <Button Content="Cool"
+                            Click="CoolButton_Click"/>
+                </StackPanel>
+
+                <!-- Bottom row: minimize to tray + status -->
+                <DockPanel Grid.Row="8" Margin="0,4,0,0">
+                    <Button Content="Minimize to tray"
+                            DockPanel.Dock="Right"
+                            Click="MinimizeToTray_Click"/>
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="Running"
+                                   FontSize="12"
+                                   Foreground="#24A148"
+                                   Margin="0,0,4,0"/>
+                        <Ellipse Width="8" Height="8" Fill="#24A148" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </Border>
+
+        <!-- Tip text -->
+        <TextBlock Grid.Row="4"
+                   Margin="2,4,0,0"
                    TextWrapping="Wrap"
-                   Opacity="0.7">
-            Tip: Put your video call window in the center of the screen.
-            The edges will act as a soft fill light on your face.
+                   FontSize="11"
+                   Foreground="#777777">
+            Place your video call window roughly in the center of the screen.
+            The rounded edge light will act like a soft ring light on your face.
         </TextBlock>
     </Grid>
 </Window>

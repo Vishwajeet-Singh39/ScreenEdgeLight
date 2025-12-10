@@ -105,7 +105,7 @@ namespace ScreenEdgeLight
             brush.Opacity = _currentOpacity;
 
             // Single border = no seams, inside remains transparent
-            EdgeBorder.BorderBrush = brush;
+            EdgeBorder.BorderBrush = brush;     
             EdgeBorder.BorderThickness = new Thickness(_currentThickness);
 
             // Rounded outer + inner corners
