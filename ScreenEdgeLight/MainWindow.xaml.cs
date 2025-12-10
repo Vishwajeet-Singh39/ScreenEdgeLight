@@ -41,7 +41,7 @@ namespace ScreenEdgeLight
             CommandBindings.Add(new CommandBinding(toggleCmd, ToggleSelf));
 
             Loaded += MainWindow_Loaded;
-            StateChanged += MainWindow_StateChanged;
+            // StateChanged += MainWindow_StateChanged;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -62,11 +62,11 @@ namespace ScreenEdgeLight
             MinimizeToTray();
         }
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
-        {
-            if (WindowState == WindowState.Minimized)
-                MinimizeToTray();
-        }
+        // private void MainWindow_StateChanged(object sender, EventArgs e)
+        // {
+        //     if (WindowState == WindowState.Minimized)
+        //         MinimizeToTray();
+        // }
 
         private void MinimizeToTray()
         {
