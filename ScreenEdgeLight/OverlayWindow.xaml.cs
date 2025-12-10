@@ -2,6 +2,8 @@
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using WinForms = System.Windows.Forms;
+
 
 namespace ScreenEdgeLight
 {
@@ -21,14 +23,38 @@ namespace ScreenEdgeLight
         }
 
         private void OverlayWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            Left   = SystemParameters.VirtualScreenLeft;
-            Top    = SystemParameters.VirtualScreenTop;
-            Width  = SystemParameters.VirtualScreenWidth;
-            Height = SystemParameters.VirtualScreenHeight;
+{
+    // Use primary screen only
+    WinForms.Screen primary = WinForms.Screen.PrimaryScreen;
 
-            ApplySettings();
-        }
+    // Full monitor bounds
+    System.Drawing.Rectangle bounds = primary.Bounds;
+    // Working area (excludes taskbar)
+    System.Drawing.Rectangle work   = primary.WorkingArea;
+
+    // Position overlay to cover the full monitor
+    Left   = bounds.Left;
+    Top    = bounds.Top;
+    Width  = bounds.Width;
+    Height = bounds.Height;
+
+    // Compute margins where the taskbar lives
+    int marginLeft   = work.Left   - bounds.Left;
+    int marginTop    = work.Top    - bounds.Top;
+    int marginRight  = bounds.Right  - work.Right;
+    int marginBottom = bounds.Bottom - work.Bottom;
+
+    // Push the edge bars away from the taskbar
+    RootGrid.Margin = new Thickness(
+        marginLeft,
+        marginTop,
+        marginRight,
+        marginBottom
+    );
+
+    ApplySettings();
+}
+
 
         private void OverlayWindow_SourceInitialized(object sender, EventArgs e)
         {
