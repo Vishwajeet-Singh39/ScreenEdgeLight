@@ -1,0 +1,56 @@
+﻿<Window x:Class="ScreenEdgeLight.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True">
+
+    <!-- Root grid is transparent; only rectangles at edges are visible -->
+    <Grid x:Name="RootGrid"
+          Background="Transparent"
+          IsHitTestVisible="False">
+
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TopRow" Height="80" />
+            <RowDefinition Height="*" />
+            <RowDefinition x:Name="BottomRow" Height="80" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftCol" Width="80" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition x:Name="RightCol" Width="80" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Top edge -->
+        <Rectangle x:Name="TopRect"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   IsHitTestVisible="False" />
+
+        <!-- Bottom edge -->
+        <Rectangle x:Name="BottomRect"
+                   Grid.Row="2"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   IsHitTestVisible="False" />
+
+        <!-- Left edge -->
+        <Rectangle x:Name="LeftRect"
+                   Grid.Row="1"
+                   Grid.Column="0"
+                   IsHitTestVisible="False" />
+
+        <!-- Right edge -->
+        <Rectangle x:Name="RightRect"
+                   Grid.Row="1"
+                   Grid.Column="2"
+                   IsHitTestVisible="False" />
+
+        <!-- No control in the center = fully transparent -->
+    </Grid>
+</Window>
