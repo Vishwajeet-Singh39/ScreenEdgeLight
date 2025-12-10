@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Controls.Primitives;
 using WinForms = System.Windows.Forms;
 using Drawing = System.Drawing;
 
@@ -20,22 +21,20 @@ namespace ScreenEdgeLight
         {
             InitializeComponent();
 
-            // Create tray icon
+            // Tray icon
             _trayIcon = new WinForms.NotifyIcon();
-            _trayIcon.Icon = Drawing.SystemIcons.Application; // you can swap this for your own .ico
+            _trayIcon.Icon = Drawing.SystemIcons.Application;
             _trayIcon.Text = "Screen Edge Light";
             _trayIcon.Visible = false;
 
-            // Tray context menu
             WinForms.ContextMenuStrip menu = new WinForms.ContextMenuStrip();
             menu.Items.Add("Show", null, OnTrayShowClicked);
             menu.Items.Add("Exit", null, OnTrayExitClicked);
             _trayIcon.ContextMenuStrip = menu;
 
-            // Double-click tray icon to show window
             _trayIcon.MouseUp += TrayIcon_MouseUp;
 
-            // Optional hotkey: Ctrl+Shift+E to toggle this window
+            // Optional hotkey: Ctrl+Shift+E to toggle control window
             RoutedCommand toggleCmd = new RoutedCommand();
             toggleCmd.InputGestures.Add(
                 new KeyGesture(Key.E, ModifierKeys.Control | ModifierKeys.Shift));
@@ -50,32 +49,23 @@ namespace ScreenEdgeLight
             UpdateOverlayEnabled();
             UpdateOverlayThickness();
             UpdateOverlayOpacity();
-            SetWarmColor();
+
+            // Default color mode
+            ApplyWarmColor();
+            SelectColorToggle(WarmToggle);
         }
 
-        // ------------ Tray handling ------------
+        // ---------- Tray logic ----------
 
         private void MinimizeToTray_Click(object sender, RoutedEventArgs e)
         {
             MinimizeToTray();
         }
-        private void TrayIcon_MouseUp(object sender, WinForms.MouseEventArgs e)
-{
-    if (e.Button == WinForms.MouseButtons.Left)
-    {
-        if (Visibility == Visibility.Visible)
-    MinimizeToTray();
-else
-    RestoreFromTray();   // single left-click restores
-    }
-}
+
         private void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            // If user clicks normal minimize button, also go to tray
             if (WindowState == WindowState.Minimized)
-            {
                 MinimizeToTray();
-            }
         }
 
         private void MinimizeToTray()
@@ -92,20 +82,20 @@ else
             _trayIcon.Visible = false;
         }
 
-        private void TrayIcon_DoubleClick(object sender, EventArgs e)
+        private void TrayIcon_MouseUp(object sender, WinForms.MouseEventArgs e)
         {
-            if (Visibility == Visibility.Visible)
-    MinimizeToTray();
-else
-    RestoreFromTray();
+            if (e.Button == WinForms.MouseButtons.Left)
+            {
+                if (Visibility == Visibility.Visible && WindowState == WindowState.Normal)
+                    MinimizeToTray();
+                else
+                    RestoreFromTray();
+            }
         }
 
         private void OnTrayShowClicked(object sender, EventArgs e)
         {
-            if (Visibility == Visibility.Visible)
-    MinimizeToTray();
-else
-    RestoreFromTray();
+            RestoreFromTray();
         }
 
         private void OnTrayExitClicked(object sender, EventArgs e)
@@ -117,25 +107,43 @@ else
 
         private void ToggleSelf(object sender, ExecutedRoutedEventArgs e)
         {
-            if (Visibility == Visibility.Visible)
-            {
+            if (Visibility == Visibility.Visible && WindowState == WindowState.Normal)
                 MinimizeToTray();
+            else
+                RestoreFromTray();
+        }
+
+        // ---------- Enable toggle ----------
+
+        private void EnableToggle_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateOverlayEnabled();
+            UpdateEnableToggleVisuals();
+        }
+
+        private void UpdateOverlayEnabled()
+        {
+            bool enabled = EnableToggle.IsChecked == true;
+            Overlay.SetEnabled(enabled);
+        }
+
+        private void UpdateEnableToggleVisuals()
+        {
+            bool enabled = EnableToggle.IsChecked == true;
+
+            if (enabled)
+            {
+                EnableToggle.Content = "Edge light ON";
             }
             else
             {
-                if (Visibility == Visibility.Visible)
-    MinimizeToTray();
-else
-    RestoreFromTray();
+                EnableToggle.Content = "Edge light OFF";
             }
+            // Background / foreground are driven mostly by style; the
+            // template uses IsChecked to switch colors.
         }
 
-        // ------------ Overlay controls ------------
-
-        private void EnableCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            UpdateOverlayEnabled();
-        }
+        // ---------- Sliders ----------
 
         private void ThicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -145,26 +153,6 @@ else
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             UpdateOverlayOpacity();
-        }
-
-        private void WarmButton_Click(object sender, RoutedEventArgs e)
-        {
-            SetWarmColor();
-        }
-
-        private void NeutralButton_Click(object sender, RoutedEventArgs e)
-        {
-            SetNeutralColor();
-        }
-
-        private void CoolButton_Click(object sender, RoutedEventArgs e)
-        {
-            SetCoolColor();
-        }
-
-        private void UpdateOverlayEnabled()
-        {
-            Overlay.SetEnabled(EnableCheckBox.IsChecked == true);
         }
 
         private void UpdateOverlayThickness()
@@ -177,20 +165,49 @@ else
             Overlay.UpdateOpacity(OpacitySlider.Value);
         }
 
-        private void SetWarmColor()
+        // ---------- Color modes ----------
+
+        private void SelectColorToggle(ToggleButton selected)
+        {
+            WarmToggle.IsChecked = (selected == WarmToggle);
+            NeutralToggle.IsChecked = (selected == NeutralToggle);
+            CoolToggle.IsChecked = (selected == CoolToggle);
+        }
+
+        private void WarmToggle_Click(object sender, RoutedEventArgs e)
+        {
+            SelectColorToggle(WarmToggle);
+            ApplyWarmColor();
+        }
+
+        private void NeutralToggle_Click(object sender, RoutedEventArgs e)
+        {
+            SelectColorToggle(NeutralToggle);
+            ApplyNeutralColor();
+        }
+
+        private void CoolToggle_Click(object sender, RoutedEventArgs e)
+        {
+            SelectColorToggle(CoolToggle);
+            ApplyCoolColor();
+        }
+
+        private void ApplyWarmColor()
         {
             Overlay.UpdateColor(Color.FromRgb(255, 244, 230)); // warm
         }
 
-        private void SetNeutralColor()
+        private void ApplyNeutralColor()
         {
             Overlay.UpdateColor(Color.FromRgb(245, 245, 245)); // neutral
         }
 
-        private void SetCoolColor()
+        private void ApplyCoolColor()
         {
             Overlay.UpdateColor(Color.FromRgb(220, 235, 255)); // cool
         }
+
+        // ---------- Shutdown ----------
 
         protected override void OnClosed(EventArgs e)
         {
