@@ -348,10 +348,10 @@
                                 VerticalAlignment="Center">
                         <!-- <Ellipse Width="8" Height="8" Fill="#24A148"
                                  VerticalAlignment="Center"/> -->
-                        <!-- <TextBlock Text="  Running"
+                        <TextBlock Text="Created with ♥️ by Vishwajeet Singh"
                                    FontSize="12"
                                    Foreground="#24A148"
-                                   VerticalAlignment="Center"/> -->
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
                 </DockPanel>
             </Grid>
